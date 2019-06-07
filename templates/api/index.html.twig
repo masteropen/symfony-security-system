@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Api{% endblock %}
+
+{% block body %}
+    <div>
+        <table>
+            <tr>
+                <th>
+                    Api
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    Access
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    users
+                </td>
+                <td>
+                    <a href="{{ path('api_users') }}">users</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

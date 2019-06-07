@@ -1,0 +1,57 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+        # allow using plaintext encoder for in_memory_provider user provider 
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    role_hierarchy:
+        ROLE_ADMIN : ROLE_USER
+
+    providers:
+        chain_provider:
+            chain:
+                providers:
+                    ['app_user_provider', 'in_memory_provider']
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        in_memory_provider:
+            memory:
+                users:
+                    admin: { password: '%env(ADMIN_PASSWORD)%', roles: ['ROLE_ADMIN'] }
+        
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        # override authentication to ^/api/* patterns
+        secured_app:
+            pattern: ^/api
+            anonymous: ~
+            provider: in_memory_provider
+            http_basic:
+                realm: realm
+            # the only way to logout in memory user is by clearing browser cookies
+            logout:
+                path: api_logout
+                target: app_login
+                invalidate_session: true
+        # authenticate to ^/ patterns
+        main:
+            pattern: ^/
+            anonymous: true
+            provider: app_user_provider
+            logout:
+                path: app_logout
+                target: app_login
+            guard:
+                authenticators:
+                    - App\Security\AppAuthenticator
+
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api, roles: ROLE_ADMIN }

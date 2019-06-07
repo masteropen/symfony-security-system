@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+	<div>
+		login as {{ app.user.email }}
+		<span style="float: right"><a href="{{ path('app_logout') }}">logout</a></span>
+	</div>
+{% endblock %}
