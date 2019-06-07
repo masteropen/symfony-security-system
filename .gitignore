@@ -25,3 +25,7 @@
 ###> tests templates ###
 templates/tests
 ###< tests templates ###
+
+###> IDE local files ###
+.idea
+###< IDE local files ###
