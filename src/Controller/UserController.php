@@ -20,6 +20,8 @@ class UserController extends AbstractController
 
     /**
      * @Route("/user/create", name="app_create_user")
+     *
+     * @param UserPasswordEncoderInterface $passwordEncoder
      */
     public function createUser(UserPasswordEncoderInterface $passwordEncoder)
     {
