@@ -1,0 +1,1 @@
+<a href="{% if app.user.ldapUser %}{{ path('ldap_logout') }}{% else %}{{ path('app_logout') }}{% endif %}">logout</a>

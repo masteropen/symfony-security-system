@@ -28,10 +28,23 @@ class User implements UserInterface
     private $roles = [];
 
     /**
+     * no required password for LDAP authenticated users
+     *
      * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="ldap_user", type="boolean")
+     */
+    private $ldapUser;
+
+    public function __construct()
+    {
+        $this->ldapUser = false;
+    }
 
     /**
      * @return int|null
@@ -127,5 +140,21 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLdapUser(): bool
+    {
+        return $this->ldapUser;
+    }
+
+    /**
+     * @param bool $ldapUser
+     */
+    public function setLdapUser(bool $ldapUser): void
+    {
+        $this->ldapUser = $ldapUser;
     }
 }

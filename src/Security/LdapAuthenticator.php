@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class AppAuthenticator extends AbstractFormLoginAuthenticator
+class LdapAuthenticator extends AbstractFormLoginAuthenticator
 {
 
     use TargetPathTrait;
@@ -66,7 +66,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function supports(Request $request)
     {
-        return 'app_login' === $request->attributes->get('_route')
+        return 'ldap_login' === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
 
@@ -96,16 +96,83 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
+
+        /**
+         * The script below require :
+         * - every user have unique mail inside the LDAP directory
+         * - every user have uid that equal to its mail
+         * feel free to modify this script to adapt to your LDAP server configuration
+         */
+
         $token = new CsrfToken('authenticate', $credentials['csrf_token']);
+
         if (!$this->csrfTokenManager->isTokenValid($token)) {
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
+        // LDAP host/port
+        $ldaphost = "localhost";
+        $ldapport = 389;
 
-        if (!$user) {
-            // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Email could not be found.');
+        // login(mail)/password provided by user in the login form
+        $login = $credentials['email'];
+        $password = $credentials['password'];
+
+        // LDAP rdn/password
+        $ldaprdn = 'cn='.$login.',ou=People,dc=maxcrc,dc=com';
+        $ldappass = $password;
+
+        // using mail filter to search for user
+        $filter = "(mail=".$login.")";
+
+        // fetching user's attributes
+        $attributes = array("mail");
+
+        // using dn to search for user
+        $ldaptree = "ou=People,dc=maxcrc,dc=com";
+
+        // connection to LDAP server
+        $ldapconn = ldap_connect($ldaphost,$ldapport) or die('could not connect to');
+
+        $user = null;
+
+        if ($ldapconn) {
+
+            // using LDAP v3
+            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+            // Binding to LDAP with login/password
+            $ldapbind = ldap_bind($ldapconn, $ldaprdn, $ldappass) or die("Error trying to bind:".ldap_error($ldapconn));
+
+            if ($ldapbind) {
+
+                // searching to user by its uid=mail and return its value
+                $result = ldap_search($ldapconn, $ldaptree, $filter, $attributes) or die("Error in search query:".ldap_error($ldapconn));
+
+                // returned data
+                $data = ldap_get_entries($ldapconn, $result);
+
+                if($data["count"] == 1){
+
+                    // fetch user from database by its email
+                    $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
+
+                    if (!$user) {
+
+                        $user = new User();
+
+                        $user->setEmail($credentials['email']);
+                        $user->setLdapUser(true);
+
+                        $this->entityManager->persist($user);
+                        $this->entityManager->flush();
+                    }
+
+                }
+
+            } else {
+                throw new CustomUserMessageAuthenticationException("LDAP bind failed ...");
+            }
         }
 
         return $user;
@@ -118,7 +185,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+        return true;
     }
 
     /**
@@ -131,7 +198,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        return new RedirectResponse($this->urlGenerator->generate('app_profile'));
+        return new RedirectResponse($this->urlGenerator->generate('company_homepage'));
     }
 
     /**
@@ -139,11 +206,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      */
     protected function getLoginUrl()
     {
-        return $this->urlGenerator->generate('app_login');
+        return $this->urlGenerator->generate('ldap_login');
     }
 
-//    public function start(Request $request, AuthenticationException $authException = null)
-//    {
-//        return new RedirectResponse('/login');
-//    }
 }

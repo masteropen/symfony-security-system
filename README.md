@@ -3,8 +3,10 @@ Symfony security system
 
 This project provide this different security strategies:
 
-- Security using an http_basic authentication to restrict access to api data by only a given ROLE_ADMIN under a memory user provider.
+- http basic (popup strategy) to authenticate users they are registered in memory.
 
-- Security using guard to restrict access to profile by only a given ROLE_USER under a entity provider.
+- login form with guard strategy to authenticate users they are registered on database.
+
+- login form with guard strategy to authenticate external users based on their LDAP credentials.
 
 Enjoy !

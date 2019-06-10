@@ -25,6 +25,7 @@ class UserController extends AbstractController
      */
     public function createUser(UserPasswordEncoderInterface $passwordEncoder)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
     	$user = new User();
 
     	$user->setEmail('noureddine-majid@hotmail.fr');

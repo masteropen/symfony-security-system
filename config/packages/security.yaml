@@ -6,7 +6,8 @@ security:
         Symfony\Component\Security\Core\User\User: plaintext
 
     role_hierarchy:
-        ROLE_ADMIN : ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        ROLE_ADMIN: ROLE_USER
 
     providers:
         chain_provider:
@@ -22,7 +23,7 @@ security:
                 users:
                     admin: { password: '%env(ADMIN_PASSWORD)%', roles: ['ROLE_ADMIN'] }
         
-
+    # authentication
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -39,10 +40,21 @@ security:
                 path: api_logout
                 target: app_login
                 invalidate_session: true
-        # authenticate to ^/ patterns
+        # authentication to ^/* patterns using LDAP directory
+#        companies_secured_area:
+#            pattern: ^/
+#            anonymous: ~
+#            provider: app_user_provider
+#            logout:
+#                path: ldap_logout
+#                target: company_homepage
+#            guard:
+#                authenticators:
+#                    - App\Security\LdapAuthenticator
+        # authentication to ^/* patterns using App\Entity\User entity provider
         main:
             pattern: ^/
-            anonymous: true
+            anonymous: ~
             provider: app_user_provider
             logout:
                 path: app_logout
@@ -51,7 +63,9 @@ security:
                 authenticators:
                     - App\Security\AppAuthenticator
 
+    # authorization
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/api, roles: ROLE_ADMIN }
+        - { path: ^/companies, roles: ROLE_USER }
