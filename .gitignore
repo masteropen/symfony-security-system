@@ -29,3 +29,5 @@ templates/tests
 ###> IDE local files ###
 /.idea/
 ###< IDE local files ###
+
+mysql-connector.jar

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -10,6 +12,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    const LAST_ADDED_USERS = 5;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -41,9 +45,15 @@ class User implements UserInterface
      */
     private $ldapUser;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Operation", mappedBy="users")
+     */
+    private $operations;
+
     public function __construct()
     {
         $this->ldapUser = false;
+        $this->operations = new ArrayCollection();
     }
 
     /**
@@ -156,5 +166,33 @@ class User implements UserInterface
     public function setLdapUser(bool $ldapUser): void
     {
         $this->ldapUser = $ldapUser;
+    }
+
+    /**
+     * @return Collection|Operation[]
+     */
+    public function getOperations(): Collection
+    {
+        return $this->operations;
+    }
+
+    public function addOperation(Operation $operation): self
+    {
+        if (!$this->operations->contains($operation)) {
+            $this->operations[] = $operation;
+            $operation->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOperation(Operation $operation): self
+    {
+        if ($this->operations->contains($operation)) {
+            $this->operations->removeElement($operation);
+            $operation->removeUser($this);
+        }
+
+        return $this;
     }
 }

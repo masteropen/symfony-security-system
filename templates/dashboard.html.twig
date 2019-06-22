@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% block menu %}
+        <ul>
+            {% for op in operations %}
+                <li>
+                    <a href="{{ path('synthesis', {id:op.id}) }}">Operation {{ op.id }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endblock menu %}
+{% endblock body %}
