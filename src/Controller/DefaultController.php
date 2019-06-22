@@ -3,12 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Operation;
-use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -20,19 +17,13 @@ class DefaultController extends AbstractController
 {
 
     /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
      * @var ObjectManager
      */
     private $om;
 
-    public function __construct(ObjectManager $om, SessionInterface $session)
+    public function __construct(ObjectManager $om)
     {
         $this->om = $om;
-        $this->session = $session;
     }
 
     /**
@@ -72,8 +63,6 @@ class DefaultController extends AbstractController
      */
     public function synthesis(Operation $operation)
     {
-        $this->session->set('currentOperation', $operation);
-
         return $this->render('synthesis.html.twig', array(
             'operation' => $operation
         ));
