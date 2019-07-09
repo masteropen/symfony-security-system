@@ -34,6 +34,6 @@ services:
                 options:
                     protocol_version: 3
                     referrals: false
+    App\Service\Fixture\FakerProvider:
+        tags: [ { name: nelmio_alice.faker.provider } ]
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones

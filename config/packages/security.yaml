@@ -17,11 +17,12 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
+                # we can remove property and implement UserLoaderInterface::loadUserByUsername($username) in UserRepository to load user by another property.
                 property: email
         in_memory_provider:
             memory:
                 users:
-                    admin: { password: '%env(ADMIN_PASSWORD)%', roles: ['ROLE_ADMIN'] }
+                    admin: { password: 123, roles: ['ROLE_ADMIN'] }
         
     # authentication
     firewalls:
@@ -29,17 +30,17 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         # override authentication to ^/api/* patterns
-        secured_app:
-            pattern: ^/api
-            anonymous: ~
-            provider: in_memory_provider
-            http_basic:
-                realm: realm
-            # the only way to logout in memory user is by clearing browser cookies
-            logout:
-                path: api_logout
-                target: app_login
-                invalidate_session: true
+#        secured_app:
+#            pattern: ^/api
+#            anonymous: ~
+#            provider: in_memory_provider
+#            http_basic:
+#                realm: realm
+#            # the only way to logout in memory user is by clearing browser cookies
+#            logout:
+#                path: api_logout
+#                target: app_login
+#                invalidate_session: true
         # authentication to ^/* patterns using LDAP directory
 #        companies_secured_area:
 #            pattern: ^/

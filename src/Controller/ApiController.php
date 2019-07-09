@@ -6,14 +6,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Access to api data by users provided by a in_memory_provider provider (under config/packages/security.yml)
+ * Access to api data by users provided by a in_memory_provider provider (under config/packages/security.yml).
  *
  * @Route("/api")
  */
 class ApiController extends AbstractController
 {
     /**
-     * List of available api data
+     * List of available api data.
      *
      * @Route("/", name="api_homepage")
      */
@@ -22,9 +22,8 @@ class ApiController extends AbstractController
         return $this->render('api/index.html.twig');
     }
 
-
     /**
-     * users data
+     * users data.
      *
      * @Route("/users", name="api_users")
      */
@@ -32,5 +31,4 @@ class ApiController extends AbstractController
     {
         return $this->render('api/json/users.json.twig');
     }
-
 }
