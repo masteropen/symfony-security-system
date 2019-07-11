@@ -3,11 +3,11 @@ security:
         App\Entity\User:
             algorithm: bcrypt
         # allow using plaintext encoder for in_memory_provider user provider 
-        Symfony\Component\Security\Core\User\User: plaintext
+#        Symfony\Component\Security\Core\User\User: plaintext
 
     role_hierarchy:
+#        ROLE_ADMIN: ROLE_USER
         ROLE_SUPER_ADMIN: ROLE_ADMIN
-        ROLE_ADMIN: ROLE_USER
 
     providers:
         chain_provider:
@@ -18,11 +18,13 @@ security:
             entity:
                 class: App\Entity\User
                 # we can remove property and implement UserLoaderInterface::loadUserByUsername($username) in UserRepository to load user by another property.
-                property: email
+#                property: email
         in_memory_provider:
             memory:
                 users:
                     admin: { password: 123, roles: ['ROLE_ADMIN'] }
+#        api_key_user_provider:
+#            id: App\Security\ApiKeyUserProvider
         
     # authentication
     firewalls:
@@ -30,7 +32,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         # override authentication to ^/api/* patterns
-#        secured_app:
+        #        secured_app:
 #            pattern: ^/api
 #            anonymous: ~
 #            provider: in_memory_provider
@@ -63,7 +65,9 @@ security:
             guard:
                 authenticators:
                     - App\Security\AppAuthenticator
-
+#            stateless: true
+#            simple_preauth:
+#                authenticator: App\Security\ApiKeyAuthenticator
     # authorization
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -28,6 +28,11 @@ templates/tests
 
 ###> IDE local files ###
 /.idea/
+ .env
 ###< IDE local files ###
 
 mysql-connector.jar
+
+###> php-cs-fixer##
+.php_cs.cache
+###< php-cs-fixer##

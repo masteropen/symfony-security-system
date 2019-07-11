@@ -11,7 +11,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -78,14 +77,10 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
     public function getCredentials(Request $request)
     {
         $credentials = [
-            'email' => $request->request->get('email'),
+            'username' => $request->request->get('username'),
             'password' => $request->request->get('password'),
             'csrf_token' => $request->request->get('_csrf_token'),
         ];
-        $request->getSession()->set(
-            Security::LAST_USERNAME,
-            $credentials['email']
-        );
 
         return $credentials;
     }
@@ -103,8 +98,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
-
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $credentials['username']]);
         if (!$user) {
             // fail authentication with a custom error
             throw new CustomUserMessageAuthenticationException('Email could not be found.');
@@ -145,9 +139,4 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
     {
         return $this->urlGenerator->generate('app_login');
     }
-
-//    public function start(Request $request, AuthenticationException $authException = null)
-//    {
-//        return new RedirectResponse('/login');
-//    }
 }

@@ -4,54 +4,9 @@
 
 {% block body %}
 	<div>
-		login as {{ app.user.email }}
+		Login as <b>{{ app.user.email }}</b>
 		<span style="float: right">
 			{{ include('common/logout.html.twig') }}
 		</span>
 	</div>
-
-	<div>
-		<span class="error_msg"></span>
-		<form name="form1">
-			<label>Email</label>
-			<input type="email" name="user_email">
-			<button type="submit">submit</button>
-		</form>
-	</div>
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script>
-		$(document).ready(function () {
-
-			var msg = 'hello';
-
-			$('form[name="form1"]').submit(function(e){
-				var form = $(this);
-				var coco = $('input[name="user_email"]').val();
-				e.preventDefault();
-
-				$.ajax({
-					method: 'POST',
-					url: '{{ path('check') }}',
-					data: {'email': coco},
-					dataType: 'json',
-					success: function(res){
-						if(res.exist == 1){
-							// $('.error_msg').html('').append('exist');
-							//  msg = 'exist';
-						}else
-							form.submit();
-							// $('.error_msg').html('').append('not exist');
-							//  msg = 'not exist';
-					}
-				});
-
-				console.log(msg);
-
-				// return false;
-			});
-		})
-	</script>
 {% endblock %}

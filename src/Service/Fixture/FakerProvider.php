@@ -2,7 +2,6 @@
 
 namespace App\Service\Fixture;
 
-use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FakerProvider
@@ -27,7 +26,7 @@ class FakerProvider
      *
      * @return string
      */
-    public function hashUserPassword(string $password)
+    public function hashUserPassword($password)
     {
         return password_hash($password, 1);
     }

@@ -16,6 +16,8 @@ class UserController extends AbstractController
      */
     public function profile()
     {
+        // (strategy : affirmative by default <=> if one voter refuse user access => Access denied Response returned)
+        $this->denyAccessUnlessGranted('ROLE_USER', $this->getUser());
         return $this->render('user/profile.html.twig', array());
     }
 
@@ -31,8 +33,8 @@ class UserController extends AbstractController
 
         $user->setEmail('noureddine-majid@hotmail.fr');
         $user->setPassword($passwordEncoder->encodePassword(
-             $user,
-             '123'
+            $user,
+            '123'
          ));
 
         $entityManager = $this->getDoctrine()->getManager();

@@ -4,12 +4,11 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Serializable; //php core interface
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User implements UserInterface, Serializable
+class User implements UserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -53,6 +52,14 @@ class User implements UserInterface, Serializable
     }
 
     /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
      * @return mixed
      */
     public function isActive()
@@ -61,19 +68,19 @@ class User implements UserInterface, Serializable
     }
 
     /**
-     * @param mixed $isActive
+     * activate user account.
      */
-    public function setIsActive($isActive): void
+    public function activate()
     {
-        $this->isActive = $isActive;
+        $this->isActive = true;
     }
 
     /**
-     * @return int|null
+     * deactivate user account.
      */
-    public function getId(): ?int
+    public function deactivate()
     {
-        return $this->id;
+        $this->isActive = false;
     }
 
     /**
@@ -97,27 +104,31 @@ class User implements UserInterface, Serializable
     }
 
     /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
+     * @return string
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return $this->username;
     }
 
     /**
-     * @see UserInterface
+     * @param string $username
      *
+     * @return User
+     */
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
      * @return array
      **/
     public function getRoles(): array
     {
-        if (!in_array('ROLE_USER', $this->roles)) {
-            $this->roles[] = 'ROLE_USER';
-        }
-
-        return array_unique($this->roles);
+        return ['ROLE_USER', 'ROLE_ADMIN'];
     }
 
     /**
@@ -133,11 +144,11 @@ class User implements UserInterface, Serializable
     }
 
     /**
-     * @see UserInterface
+     * @return string
      */
     public function getPassword(): string
     {
-        return (string) $this->password;
+        return $this->password;
     }
 
     /**
@@ -165,42 +176,5 @@ class User implements UserInterface, Serializable
      */
     public function eraseCredentials()
     {
-    }
-
-    /**
-     * @return string
-     */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->username,
-            $this->password,
-        ));
-    }
-
-    /**
-     * @see \Serializable::unserialize()
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized)
-    {
-        list(
-            $this->id,
-            $this->username,
-            $this->password) = unserialize($serialized, array('allowed_classes' => false));
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getIsActive(): ?bool
-    {
-        return $this->isActive;
     }
 }
