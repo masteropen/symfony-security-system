@@ -11,111 +11,52 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="array")
+     */
+    private $roles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255)
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=254, unique=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $salt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="array")
-     */
-    private $roles;
-
-    /**
-     * @ORM\Column(name="is_active", type="boolean")
+     * @ORM\Column(type="boolean")
      */
     private $isActive;
 
-    /**
-     * User constructor.
-     */
-    public function __construct()
-    {
-        // you can refer to a strategy before activate user account.
-        $this->isActive = true;
-    }
-
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
-    public function isActive()
-    {
-        return $this->isActive;
-    }
-
-    /**
-     * activate user account.
-     */
-    public function activate()
-    {
-        $this->isActive = true;
-    }
-
-    /**
-     * deactivate user account.
-     */
-    public function deactivate()
-    {
-        $this->isActive = false;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param string $email
-     *
-     * @return User
-     */
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
-    /**
-     * @param string $username
-     *
-     * @return User
-     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -123,19 +64,14 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return array
-     **/
-    public function getRoles(): array
+    public function getRoles(): ?array
     {
-        return ['ROLE_USER', 'ROLE_ADMIN'];
+        if (!in_array('ROLE_USER', $this->roles)) {
+            $this->roles[] = 'ROLE_USER';
+        }
+        return $this->roles;
     }
 
-    /**
-     * @param array $roles
-     *
-     * @return User
-     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -143,19 +79,11 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * @param string $password
-     *
-     * @return User
-     */
     public function setPassword(string $password): self
     {
         $this->password = $password;
@@ -163,18 +91,44 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function getSalt()
+    public function getSalt(): ?string
     {
-        return null;
+        return $this->salt;
     }
 
-    /**
-     * @see UserInterface
-     */
+    public function setSalt(string $salt): self
+    {
+        $this->salt = $salt;
+
+        return $this;
+    }
+
     public function eraseCredentials()
     {
+
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
     }
 }

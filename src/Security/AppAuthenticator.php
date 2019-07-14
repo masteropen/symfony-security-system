@@ -17,6 +17,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Doctrine\ORM\NonUniqueResultException;
 
 class AppAuthenticator extends AbstractFormLoginAuthenticator
 {
@@ -90,6 +91,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
      * @param UserProviderInterface $userProvider
      *
      * @return User|object|UserInterface|null
+     * @throws NonUniqueResultException
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
@@ -98,10 +100,11 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $credentials['username']]);
+        $user = $this->entityManager->getRepository(User::class)->loadUserByUsername($credentials['username']);
+
         if (!$user) {
             // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Email could not be found.');
+            throw new CustomUserMessageAuthenticationException('User could not be found.');
         }
 
         return $user;
